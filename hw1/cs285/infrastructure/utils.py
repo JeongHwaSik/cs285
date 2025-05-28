@@ -14,7 +14,11 @@ from cs285.infrastructure import pytorch_util as ptu
 
 
 def sample_trajectory(env, policy, max_path_length, render=False):
-    """Sample a rollout in the environment from a policy."""
+    """Sample a rollout in the environment from a policy.
+
+    Simulate a single episode (trajectory / rollout) of an agent interacting with the environment
+    using a given policy
+    """
     
     # initialize env for the beginning of a new rollout
     ob =  env.reset() # TODO: initial observation after resetting the env
@@ -31,17 +35,19 @@ def sample_trajectory(env, policy, max_path_length, render=False):
             else:
                 img = env.render(mode='single_rgb_array')
             image_obs.append(cv2.resize(img, dsize=(250, 250), interpolation=cv2.INTER_CUBIC))
-    
+
+
         # TODO use the most recent ob to decide what to do
-        ac = TODO # HINT: this is a numpy array
-        ac = ac[0]
+        ac = policy.forward(ob) # HINT: this is a numpy array
+        ac = ptu.to_numpy(ac)
+        # ac = ac[0]
 
         # TODO: take that action and get reward and next ob
-        next_ob, rew, done, _ = TODO
+        next_ob, rew, done, _ = env.step(ac) # returns a tuple (obs, reward, done, info)
         
         # TODO rollout can end due to done, or due to max_path_length
         steps += 1
-        rollout_done = TODO # HINT: this is either 0 or 1
+        rollout_done = done or steps>=max_path_length # HINT: this is either 0 or 1
         
         # record result of taking that action
         obs.append(ob)

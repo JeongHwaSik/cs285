@@ -142,6 +142,7 @@ def run_training_loop(params):
                 # HINT: query the policy (using the get_action function) with paths[i]["observation"]
                 # and replace paths[i]["action"] with these expert labels
                 paths = TODO
+            
 
         total_envsteps += envsteps_this_batch
         # add collected data to replay buffer
@@ -152,16 +153,18 @@ def run_training_loop(params):
         training_logs = []
         for _ in range(params['num_agent_train_steps_per_iter']):
 
-          # TODO: sample some data from replay_buffer
-          # HINT1: how much data = params['train_batch_size']
-          # HINT2: use np.random.permutation to sample random indices
-          # HINT3: return corresponding data points from each array (i.e., not different indices from each array)
-          # for imitation learning, we only need observations and actions.  
-          ob_batch, ac_batch = TODO
+            # TODO: sample some data from replay_buffer
+            # HINT1: how much data = params['train_batch_size']
+            # HINT2: use np.random.permutation to sample random indices
+            # HINT3: return corresponding data points from each array (i.e., not different indices from each array)
+            # for imitation learning, we only need observations and actions.  
+            size = min(len(replay_buffer.obs), params['train_batch_size'])
+            sample_indices = np.random.permutation(len(replay_buffer.obs))[:size]
+            ob_batch, ac_batch = replay_buffer.obs[sample_indices], replay_buffer.acs[sample_indices]
 
-          # use the sampled data to train an agent
-          train_log = actor.update(ob_batch, ac_batch)
-          training_logs.append(train_log)
+            # use the sampled data to train an agent
+            train_log = actor.update(ob_batch, ac_batch)
+            training_logs.append(train_log)
 
         # log/save
         print('\nBeginning logging procedure...')
@@ -183,7 +186,8 @@ def run_training_loop(params):
             # save eval metrics
             print("\nCollecting data for eval...")
             eval_paths, eval_envsteps_this_batch = utils.sample_trajectories(
-                env, actor, params['eval_batch_size'], params['ep_len'])
+                env, actor, params['eval_batch_size'], params['ep_len']
+            )
 
             logs = utils.compute_metrics(paths, eval_paths)
             # compute additional metrics
@@ -237,6 +241,7 @@ def main():
     parser.add_argument('--save_params', action='store_true')
     parser.add_argument('--seed', type=int, default=1)
     args = parser.parse_args()
+
 
     # convert args to dictionary
     params = vars(args)
