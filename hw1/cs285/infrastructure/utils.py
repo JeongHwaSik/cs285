@@ -36,11 +36,11 @@ def sample_trajectory(env, policy, max_path_length, render=False):
                 img = env.render(mode='single_rgb_array')
             image_obs.append(cv2.resize(img, dsize=(250, 250), interpolation=cv2.INTER_CUBIC))
 
-
         # TODO use the most recent ob to decide what to do
-        ac = policy.forward(ob) # HINT: this is a numpy array
+        ac = policy(ptu.from_numpy(ob)) # HINT: this is a numpy array
         ac = ptu.to_numpy(ac)
-        # ac = ac[0]
+        if ac.ndim == 2:
+            ac = ac[0]
 
         # TODO: take that action and get reward and next ob
         next_ob, rew, done, _ = env.step(ac) # returns a tuple (obs, reward, done, info)

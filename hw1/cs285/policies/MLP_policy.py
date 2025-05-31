@@ -134,7 +134,7 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
         mean = self.mean_net(observation)
         std = torch.exp(self.logstd)
-        dist = torch.distributions.Normal(mean, std)
+        dist = distributions.Normal(mean, std)
 
         return dist.rsample() # reparameterization trick
 
@@ -152,7 +152,7 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             actions = ptu.from_numpy(actions)
 
         pred_acts = self.forward(observations)
-        loss = F.cross_entropy(pred_acts, actions)
+        loss = F.mse_loss(pred_acts, actions)
 
         self.optimizer.zero_grad()
         loss.backward()
