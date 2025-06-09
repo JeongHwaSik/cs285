@@ -45,7 +45,7 @@ class ValueCritic(nn.Module):
         q_values = ptu.from_numpy(q_values)
 
         # TODO: update the critic using the observations and q_values
-        v_pred = self(obs).unsqueeze(1)
+        v_pred = self(obs)
         loss = F.mse_loss(v_pred, q_values)
 
         self.optimizer.zero_grad()

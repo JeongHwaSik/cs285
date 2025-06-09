@@ -106,6 +106,14 @@ class MLPPolicyPG(MLPPolicy):
         log_prob = acs_dist.log_prob(actions)
         loss = -torch.mean(log_prob * advantages)
 
+        # per_traj_losses = []
+        # for traj in trajectories:
+        #     log_probs = ...  # log π(a|s) for this traj
+        #     advantages = ...  # reward-to-go for this traj
+        #     per_traj_loss = torch.sum(log_probs * advantages)
+        #     per_traj_losses.append(per_traj_loss)
+        # loss = -torch.mean(torch.stack(per_traj_losses))
+
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
